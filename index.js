@@ -6,6 +6,14 @@
 
 var _ = require('lodash');
 
+function endsWith(string, ends) {
+  return string.substr(string.length - ends.length) === ends;
+}
+
+function trimEnds(string, size) {
+  return string.substr(0, string.length - size);
+}
+
 /**
  * 检查依赖
  * @param {string|object} depends
@@ -23,44 +31,62 @@ function checkDepends(depends, data) {
     return !!data[depends];
   }
   if (depends.$or) {
-    var found = _.find(depends.$or, function (d) {
+    return _.find(depends.$or, function (d) {
       return checkDepends(d, data);
     });
-
-    if (depends[0] === '!') {
-      return !found;
-    } else {
-      return found;
-    }
   }
   return _.every(depends, function (v, k) {
+    // 值是数组
     if (_.isArray(v)) {
-      if (k[0] === '!') {
-        k = k.substr(1);
+      if (endsWith(k, '!=')) {
+        k = trimEnds(k, 2);
         return v.indexOf(data[k]) === -1;
       }
       return v.indexOf(data[k]) > -1;
     }
-    if (k[0] === '!') {
-      k = k.substr(1);
-      return data[k] != v;
+
+    // 值是引用
+    if (typeof v === 'string' && v[0] === ':') {
+      v = data[v.substr(1)];
     }
-    if (k[0] === '>') {
-      k = k.substr(1);
-      if (k[0] === '=') {
-        k = k.substr(1);
-        return data[k] >= v;
-      }
+
+    // 大于
+    if (endsWith(k, '>')) {
+      k = trimEnds(k, 1);
       return data[k] > v;
     }
-    if (k[0] === '<') {
-      k = k.substr(1);
-      if (k[0] === '=') {
-        k = k.substr(1);
-        return data[k] <= v;
-      }
+    // 大于等于
+    if (endsWith(k, '>=')) {
+      k = trimEnds(k, 2);
+      return data[k] >= v;
+    }
+    // 小于
+    if (endsWith(k, '<')) {
+      k = trimEnds(k, 1);
       return data[k] < v;
     }
+    // 小于等于
+    if (endsWith(k, '<=')) {
+      k = trimEnds(k, 2);
+      return data[k] <= v;
+    }
+    // 精确相等
+    if (endsWith(k, '===')) {
+      k = trimEnds(k, 3);
+      return data[k] === v;
+    }
+    // 精确不等
+    if (endsWith(k, '!==')) {
+      k = trimEnds(k, 3);
+      return data[k] !== v;
+    }
+    // 不等
+    if (endsWith(k, '!=')) {
+      k = trimEnds(k, 2);
+      return data[k] != v;
+    }
+
+    // 相等
     return data[k] == v;
   });
 }

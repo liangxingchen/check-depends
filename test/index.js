@@ -16,6 +16,8 @@ const data = {
   from: 2016,
   awesome: true,
   bugs: 0,
+  zero: 0,
+  no: false,
   others: null
 };
 
@@ -35,7 +37,7 @@ describe('string', function () {
   it('number', function () {
     assert(checkDepends('from', data));
   });
-  it('!number', function () {
+  it('!number!', function () {
     assert(!checkDepends('!from', data));
   });
   it('number 0', function () {
@@ -62,71 +64,89 @@ describe('object', function () {
   it('string', function () {
     assert(checkDepends({ 'license': 'MIT' }, data));
   });
-  it('!string', function () {
-    assert(!checkDepends({ '!license': 'MIT' }, data));
+  it('string!=', function () {
+    assert(!checkDepends({ 'license!=': 'MIT' }, data));
   });
   it('string neq', function () {
     assert(!checkDepends({ 'license': 'Apache' }, data));
   });
-  it('!string neq', function () {
-    assert(checkDepends({ '!license': 'Apache' }, data));
+  it('string!= neq', function () {
+    assert(checkDepends({ 'license!=': 'Apache' }, data));
   });
   it('number', function () {
     assert(checkDepends({ 'from': 2016 }, data));
   });
-  it('!number', function () {
-    assert(!checkDepends({ '!from': 2016 }, data));
+  it('number!=', function () {
+    assert(!checkDepends({ 'from!=': 2016 }, data));
   });
   it('number neq', function () {
     assert(!checkDepends({ 'from': 2017 }, data));
   });
-  it('!number neq', function () {
-    assert(checkDepends({ '!from': 2017 }, data));
+  it('number!= neq', function () {
+    assert(checkDepends({ 'from!=': 2017 }, data));
   });
   it('number >', function () {
-    assert(checkDepends({ '>from': 2015 }, data));
+    assert(checkDepends({ 'from>': 2015 }, data));
   });
   it('number >=', function () {
-    assert(checkDepends({ '!=from': 2016 }, data));
+    assert(checkDepends({ 'from>=': 2016 }, data));
   });
   it('number <', function () {
-    assert(checkDepends({ '<from': 2017 }, data));
+    assert(checkDepends({ 'from<': 2017 }, data));
   });
   it('number <=', function () {
-    assert(checkDepends({ '<=from': 2016 }, data));
+    assert(checkDepends({ 'from<=': 2016 }, data));
   });
   it('boolean', function () {
     assert(checkDepends({ 'awesome': true }, data));
   });
-  it('!boolean', function () {
-    assert(!checkDepends({ '!awesome': true }, data));
+  it('boolean!=', function () {
+    assert(!checkDepends({ 'awesome!=': true }, data));
   });
   it('boolean false', function () {
     assert(!checkDepends({ 'awesome': false }, data));
   });
-  it('!boolean false', function () {
-    assert(checkDepends({ '!awesome': false }, data));
+  it('boolean!= false', function () {
+    assert(checkDepends({ 'awesome!=': false }, data));
   });
   it('boolean 1', function () {
     assert(checkDepends({ 'awesome': 1 }, data));
   });
-  it('!boolean 1', function () {
-    assert(!checkDepends({ '!awesome': 1 }, data));
+  it('boolean!= 1', function () {
+    assert(!checkDepends({ 'awesome!=': 1 }, data));
   });
   it('boolean null', function () {
     assert(!checkDepends({ 'others': true }, data));
   });
-  it('array', function () {
+  it('string in array', function () {
     assert(checkDepends({ 'license': ['MIT', 'Apache', 'BSD'] }, data));
   });
-  it('!array', function () {
-    assert(!checkDepends({ '!license': ['MIT', 'Apache', 'BSD'] }, data));
+  it('string!= in array', function () {
+    assert(!checkDepends({ 'license!=': ['MIT', 'Apache', 'BSD'] }, data));
   });
-  it('array not found', function () {
+  it('string in array not found', function () {
     assert(!checkDepends({ 'name': ['MIT', 'Apache', 'BSD'] }, data));
   });
-  it('!array not found', function () {
-    assert(checkDepends({ '!name': ['MIT', 'Apache', 'BSD'] }, data));
+  it('string!= in array not found', function () {
+    assert(checkDepends({ 'name!=': ['MIT', 'Apache', 'BSD'] }, data));
+  });
+  it('number = :ref', function () {
+    assert(checkDepends({ 'bugs': ':zero' }, data));
+  });
+  it('number > :ref', function () {
+    assert(checkDepends({ 'from>': ':zero' }, data));
+  });
+  it('number <= :ref', function () {
+    assert(checkDepends({ 'bugs<=': ':zero' }, data));
+  });
+  it('string > :ref', function () {
+    assert(checkDepends({ 'license>': ':name' }, data));
+  });
+  it('0 === false', function () {
+    assert(!checkDepends({ 'no===': ':zero' }, data));
+  });
+  it('0 !== false', function () {
+    assert(checkDepends({ 'no!==': ':zero' }, data));
   });
 
   it('assembly', function () {
@@ -134,7 +154,7 @@ describe('object', function () {
       'license': ['MIT', 'Apache', 'BSD'],
       'from': 2016,
       'bugs': 0,
-      '!undefined': 1
+      'undefined!=': 1
     }, data));
   });
 
@@ -144,7 +164,7 @@ describe('object', function () {
         'license': ['MIT', 'Apache', 'BSD'],
         'from': 2017,
         'bugs': 0,
-        '!undefined': 1
+        'undefined!=': 1
       }, {
         'from': 2016
       }]
