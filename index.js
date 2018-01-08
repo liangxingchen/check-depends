@@ -256,12 +256,15 @@ function checkValue(value, exp, topData) {
 
 /**
  * 检查依赖
- * @param {boolean|string|Object} query
+ * @param {undefined|null|boolean|string|Object} query
  * @param {Object} data
  * @param {Object} [topData]
  * @returns {boolean}
  */
 function checkDepends(query, data, topData) {
+  if (query === undefined) return false;
+  if (query === null) return false;
+  if (query === '') return false;
   if (typeof query === 'boolean') return query;
   if (typeof query === 'string') {
     if (query[0] === '!') {
