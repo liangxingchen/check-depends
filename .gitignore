@@ -1,3 +1,6 @@
 node_modules
 *.log
 package-lock.json
+.history
+.nyc_output
+coverage

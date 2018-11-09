@@ -1,11 +1,16 @@
 {
   "name": "check-depends",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Check object depends",
-  "keywords": ["data check", "validator"],
+  "keywords": [
+    "data check",
+    "validator"
+  ],
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "cover": "nyc mocha; nyc report --reporter=html"
   },
   "repository": {
     "type": "git",
@@ -18,11 +23,11 @@
   },
   "homepage": "https://github.com/maichong/check-depends#readme",
   "devDependencies": {
-    "mocha": "^4.1.0"
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0"
   },
   "dependencies": {
-    "ajv": "^5.5.2",
-    "depd": "^1.1.1",
-    "lodash": "^4.17.4"
+    "ajv": "^6.5.5",
+    "lodash": "^4.17.11"
   }
 }

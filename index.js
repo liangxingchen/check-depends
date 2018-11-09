@@ -1,14 +1,6 @@
-/**
- * @copyright Maichong Software Ltd. 2017 http://maichong.it
- * @date 2017-01-17
- * @author Liang <liang@maichong.it>
- */
-
 var _ = require('lodash');
-var depd = require('depd');
 var Ajv = require('ajv');
 
-var deprecate = depd('check-depends');
 var ajv = new Ajv();
 
 /**
@@ -276,29 +268,6 @@ function checkDepends(query, data, topData) {
   }
   topData = topData || data;
   return _.every(query, function (value, key) {
-    // deprecated
-    if (_.endsWith(key, '>')) {
-      deprecate('key> is deprecated, please use $gt query operator instead');
-    }
-    if (_.endsWith(key, '>=')) {
-      deprecate('key>= is deprecated, please use $gte query operator instead');
-    }
-    if (_.endsWith(key, '<')) {
-      deprecate('key< is deprecated, please use $lt query operator instead');
-    }
-    if (_.endsWith(key, '<=')) {
-      deprecate('key<= is deprecated, please use $lte query operator instead');
-    }
-    if (_.endsWith(key, '===')) {
-      deprecate('key=== is deprecated, please use $eq query operator instead');
-    }
-    if (_.endsWith(key, '!==')) {
-      deprecate('key!== is deprecated, please use $ne query operator instead');
-    }
-    if (_.endsWith(key, '!=')) {
-      deprecate('key!= is deprecated, please use $ne query operator instead');
-    }
-
     // 值是引用
     value = getRef(value, topData);
 
