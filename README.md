@@ -16,7 +16,7 @@ const data = {
   numbers: [0, 15, 20],
   empty: [],
   obj: {},
-  object: { attr: 1 },
+  object: { attr: 1, foo: 'bar' },
   regexp: '/Alaska/',
   from: 2016,
   awesome: true,
@@ -28,19 +28,22 @@ const data = {
   undefined: undefined
 };
 
-checkDepends('name',data); // true
-checkDepends('!name',data); // false
-checkDepends('others',data); // false
-checkDepends({name:'Alaska'},data); // true
+checkDepends('name', data); // true
+checkDepends('!name', data); // false
+checkDepends('others', data); // false
+checkDepends({ name: 'Alaska' }, data); // true
+checkDepends({ 'name.length': 6 }, data); // true
 checkDepends({ name: ':regexp' }, data); // true
-checkDepends({from:{ $gt: 2015 }},data); // true
-checkDepends({tags:/web/ },data); // true
-checkDepends({obj:{} },data); // true
-checkDepends({object:{attr:1} },data); // true
-checkDepends({numbers:{ $all:[15,20] } },data); // true
-checkDepends({ $or: [{name: '/alaska/i'}, { no: true }] },data); // true
+checkDepends({ from: { $gt: 2015 } }, data); // true
+checkDepends({ tags: /web/ }, data); // true
+checkDepends({ obj: {} }, data); // true
+checkDepends({ object: { attr: 1, foo: 'bar' } }, data); // true
+checkDepends({ 'object.foo': 'bar' }, data); // true
+checkDepends({ numbers: { $all: [15, 20] } }, data); // true
+checkDepends({ 'tags.length': 2 }, data); // true
+checkDepends({ $or: [{ name: '/alaska/i' }, { no: true }] }, data); // true
 checkDepends({ $jsonSchema: {} }); //true
-checkDepends({ $jsonSchema: { properties: {name:{ type:'number' }}} }); //false
+checkDepends({ $jsonSchema: { properties: { name: { type: 'number' } } } }); //false
 ```
 
 
@@ -77,7 +80,8 @@ checkDepends({ $jsonSchema: { properties: {name:{ type:'number' }}} }); //false
 - MongoDB中不能查询undefined
 - check-depends 中可以用字符串表示正则
 - MongoDB支持JSON Schema draft 4，check-depends 使用AJV验证JSON Schema
-- check-depends 中`:`开头的字符串 `:key`，代表data值引用 
+- check-depends 中`:`开头的字符串 `:key`，代表data值引用
+- check-depends 支持 string.length 和 array.length 查询
 
 差异举例：
 

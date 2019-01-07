@@ -54,4 +54,7 @@ describe('test $elemMatch', function () {
   it('test $elemMatch object array', function () {
     assert(checkDepends({ contributors: { $elemMatch: { name: { $regex: /liang/, $options: 'i' } } } }, data));
   });
+  it('test $elemMatch object array', function () {
+    assert(checkDepends({ contributors: { $elemMatch: { 'name.length': 5 } } }, data));
+  });
 });

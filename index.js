@@ -5,45 +5,43 @@ var ajv = new Ajv();
 
 /**
  * 将字符串转换为正则
- * @param {any} value
+ * @param {any} test
  * @returns {*|RegExp}
  */
-function checkRegExp(value) {
-  if (typeof value === 'string' && value[0] === '/') {
-    var matchs = value.match(/^\/(.+)\/([igm]*)$/);
+function checkRegExp(test) {
+  if (typeof test === 'string' && test[0] === '/') {
+    var matchs = test.match(/^\/(.+)\/([igm]*)$/);
     if (matchs) {
-      value = new RegExp(matchs[1], matchs[2]);
+      test = new RegExp(matchs[1], matchs[2]);
     }
   }
-  return value;
+  return test;
 }
 
-function getRef(value, topData) {
-  if (typeof value === 'string' && value[0] === ':') {
-    var key = value.substr(1);
-    if (topData.hasOwnProperty(key)) {
-      value = topData[value.substr(1)];
-    }
+function getRef(test, topData) {
+  if (typeof test === 'string' && test[0] === ':') {
+    var key = test.substr(1);
+    return _.get(topData, key);
   }
-  return value;
+  return test;
 }
 
 /**
  * 检查值是否存在于数组中，支持正则数组匹配字符串值
- * @param {any} value
+ * @param {any} val
  * @param {Array<any>} array
  * @param {Object} topData
  * @returns {boolean}
  */
-function inArray(value, array, topData) {
+function inArray(val, array, topData) {
   for (var i in array) {
     var v = array[i];
     v = getRef(v, topData);
     v = checkRegExp(v);
-    if (typeof value === 'string' && v && v instanceof RegExp) {
-      if (v.test(value)) return true;
+    if (typeof val === 'string' && v && v instanceof RegExp) {
+      if (v.test(val)) return true;
     } else {
-      if (value === v) return true;
+      if (val === v) return true;
     }
   }
   return false;
@@ -52,19 +50,19 @@ function inArray(value, array, topData) {
 /**
  *
  * @param {Array<any>|any} array 数组或数据
- * @param {any|RegExp} element
+ * @param {any|RegExp} test
  * @param {Object} topData
  * @returns {boolean}
  */
-function findArrayElement(array, element, topData) {
-  element = getRef(element, topData);
-  element = checkRegExp(element);
-  if (element instanceof RegExp) {
+function findArrayElement(array, test, topData) {
+  test = getRef(test, topData);
+  test = checkRegExp(test);
+  if (test instanceof RegExp) {
     if (typeof array === 'string') {
-      return element.test(array);
+      return test.test(array);
     } else if (_.isArray(array)) {
       return _.find(array, function (el) {
-        return typeof el === 'string' && element.test(el);
+        return typeof el === 'string' && test.test(el);
       })
     } else {
       return false;
@@ -72,10 +70,10 @@ function findArrayElement(array, element, topData) {
   }
 
   if (_.isArray(array)) {
-    return array.indexOf(element) > -1;
+    return array.indexOf(test) > -1;
   }
 
-  return array === element;
+  return array === test;
 }
 
 /**
@@ -103,11 +101,11 @@ function isExpression(exp) {
 /**
  * 检查数据
  * @param {string} value 值
- * @param {Object} exp 表达式
+ * @param {Object} test 表达式
  * @param {Object} topData
  */
-function checkValue(value, exp, topData) {
-  return _.every(exp, function (val, operator) {
+function checkValue(value, test, topData) {
+  return _.every(test, function (val, operator) {
     val = getRef(val, topData);
     if (operator === '$eq') {
       if (_.isArray(value) && !_.isArray(val)) {
@@ -162,14 +160,14 @@ function checkValue(value, exp, topData) {
       }
     }
     if (operator === '$regex') {
-      if (exp.$options !== undefined && typeof exp.$options !== 'string') {
+      if (test.$options !== undefined && typeof test.$options !== 'string') {
         throw new Error('$options has to be a string');
       }
       if (typeof val === 'string') {
-        val = new RegExp(val, exp.$options);
+        val = new RegExp(val, test.$options);
       } else if (val instanceof RegExp) {
-        if (exp.$options) {
-          val.compile(val.source, exp.$options);
+        if (test.$options) {
+          val.compile(val.source, test.$options);
         }
       } else {
         throw new Error('$regex has to be a string or RegExp');
@@ -180,7 +178,7 @@ function checkValue(value, exp, topData) {
       return false;
     }
     if (operator === '$options') {
-      if (!exp.$regex) {
+      if (!test.$regex) {
         throw new Error('$options needs a $regex');
       }
       return true;
@@ -254,7 +252,7 @@ function checkValue(value, exp, topData) {
  * @returns {boolean}
  */
 function checkDepends(query, data, topData) {
-  if (query === undefined) return false;
+  if (query === undefined || data === undefined) return false;
   if (query === null) return false;
   if (query === '') return false;
   if (typeof query === 'boolean') return query;
@@ -267,56 +265,57 @@ function checkDepends(query, data, topData) {
     return !!data[query];
   }
   topData = topData || data;
-  return _.every(query, function (value, key) {
+  return _.every(query, function (test, key) {
     // 值是引用
-    value = getRef(value, topData);
+    test = getRef(test, topData);
 
     if (key === '$and') {
-      if (!_.isArray(value)) {
+      if (!_.isArray(test)) {
         throw new Error('$and must be an array');
       }
-      return _.every(value, function (v) {
+      return _.every(test, function (v) {
         return checkDepends(v, data, topData);
       });
     } else if (key === '$or') {
-      if (!_.isArray(value)) {
+      if (!_.isArray(test)) {
         throw new Error('$or must be an array');
       }
-      return _.find(value, function (v) {
+      return _.find(test, function (v) {
         return checkDepends(v, data, topData);
       });
     } else if (key === '$nor') {
-      if (!_.isArray(value)) {
+      if (!_.isArray(test)) {
         throw new Error('$nor must be an array');
       }
-      return !_.find(value, function (v) {
+      return !_.find(test, function (v) {
         return checkDepends(v, data, topData);
       });
     } else if (key === '$jsonSchema') {
-      if (!value || typeof value !== 'object' || _.isArray(value)) {
+      if (!test || typeof test !== 'object' || _.isArray(test)) {
         throw new Error('$jsonSchema must be an object');
       }
-      return ajv.validate(value, data);
+      return ajv.validate(test, data);
     } else if (key[0] === '$') {
       throw new Error('unsupported top level operator: ' + key);
     }
 
-    value = checkRegExp(value);
+    test = checkRegExp(test);
+    var value = _.get(data, key);
 
-    if (isExpression(value)) {
+    if (isExpression(test)) {
       // 表达式对象
-      return checkValue(data[key], value, topData);
+      return checkValue(value, test, topData);
     }
 
-    if (_.isArray(data[key]) && !_.isArray(value)) {
-      return findArrayElement(data[key], value, topData);
+    if (_.isArray(value) && !_.isArray(test)) {
+      return findArrayElement(value, test, topData);
     }
 
-    if (typeof data[key] === 'string' && value instanceof RegExp) {
-      return value.test(data[key]);
+    if (typeof value === 'string' && test instanceof RegExp) {
+      return test.test(value);
     }
 
-    return _.isEqual(value, data[key]);
+    return _.isEqual(test, value);
   });
 }
 

@@ -16,6 +16,10 @@ describe('query plain object', function () {
     assert(!checkDepends({ license: 'GPL' }, data));
   });
 
+  it('query string.length', function () {
+    assert(checkDepends({ 'license.length': 3 }, data));
+  });
+
   it('value is number', function () {
     assert(checkDepends({ from: 2016 }, data));
   });
@@ -99,11 +103,15 @@ describe('query plain object', function () {
   });
 
   it('query {...} & value is {...}', function () {
-    assert(checkDepends({ object: { attr: 1 } }, data));
+    assert(checkDepends({ object: { attr: 1, foo: 'bar' } }, data));
   });
 
   it('reverse: query {...} & value is {...}', function () {
     assert(!checkDepends({ object: { attr: 1, $gt: 0 } }, data));
+  });
+
+  it('query object.key', function () {
+    assert(checkDepends({ 'object.foo': 'bar' }, data));
   });
 
   it('query string & value is string array', function () {
@@ -137,6 +145,15 @@ describe('query plain object', function () {
   it('reverse: query string[] & value is string[]', function () {
     assert(!checkDepends({ tags: ['app', 'web'] }, data));
   });
+
+  it('query array.length $gte', function () {
+    assert(checkDepends({ 'empty.length': 0 }, data));
+  });
+
+  it('query array.length', function () {
+    assert(checkDepends({ 'tags.length': { $gt: 1 } }, data));
+  });
+
   it('value = :ref', function () {
     assert(checkDepends({ bugs: ':zero' }, data));
   });

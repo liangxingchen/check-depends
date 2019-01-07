@@ -16,7 +16,7 @@ module.exports = {
     { name: 'Maichong Cloud', email: 'support@maichong.io', url: 'https://maichong.io' }
   ],
   obj: {},
-  object: { attr: 1 },
+  object: { attr: 1, foo: 'bar' },
   regexp: '/Alaska/',
   from: 2016,
   awesome: true,
