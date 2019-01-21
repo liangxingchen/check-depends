@@ -24,9 +24,9 @@ declare namespace CheckDepends {
 
   interface QueryExpression {
     [key: string]: Value | ComparisonExpression;
-    $and?: ComparisonExpression[];
-    $nor?: ComparisonExpression[];
-    $or?: ComparisonExpression[];
+    $and?: QueryExpression[];
+    $nor?: QueryExpression[];
+    $or?: QueryExpression[];
     $jsonSchema?: any;
   }
 
