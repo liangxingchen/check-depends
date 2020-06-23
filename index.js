@@ -18,6 +18,10 @@ function checkRegExp(test) {
   return test;
 }
 
+function isObjectId(val) {
+  return val && typeof val === 'object' && typeof val.toHexString === 'function';
+}
+
 function getRef(test, topData) {
   if (typeof test === 'string' && test[0] === ':') {
     var key = test.substr(1);
@@ -34,9 +38,14 @@ function getRef(test, topData) {
  * @returns {boolean}
  */
 function inArray(val, array, topData) {
+  var valueIsObjectId = isObjectId(val);
   for (var i in array) {
     var v = array[i];
     v = getRef(v, topData);
+    if (valueIsObjectId) {
+      if (isObjectId(v) && v.toHexString() === val.toHexString()) return true;
+      continue;
+    }
     v = checkRegExp(v);
     if (typeof val === 'string' && v && v instanceof RegExp) {
       if (v.test(val)) return true;
@@ -63,13 +72,17 @@ function findArrayElement(array, test, topData) {
     } else if (_.isArray(array)) {
       return _.find(array, function (el) {
         return typeof el === 'string' && test.test(el);
-      })
+      });
     } else {
       return false;
     }
   }
 
   if (_.isArray(array)) {
+    if (isObjectId(test))
+      return !!_.find(array, function (v) {
+        return isObjectId(v) && v.toHexString() === test.toHexString();
+      });
     return array.indexOf(test) > -1;
   }
 
@@ -133,9 +146,9 @@ function checkValue(value, test, topData) {
         throw new Error('$in must be an array');
       }
       if (_.isArray(value)) {
-        return _.find(value, function (v) {
+        return !!_.find(value, function (v) {
           return inArray(v, val, topData);
-        })
+        });
       }
       return inArray(value, val, topData);
     }
@@ -146,7 +159,7 @@ function checkValue(value, test, topData) {
       if (_.isArray(value)) {
         return _.every(value, function (v) {
           return !inArray(v, val, topData);
-        })
+        });
       }
       return !inArray(value, val, topData);
     }
@@ -241,7 +254,7 @@ function checkValue(value, test, topData) {
       return val ? !res : res;
     }
     throw new Error('unsupported comparison operator: ' + operator);
-  })
+  });
 }
 
 /**

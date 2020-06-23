@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -23,6 +24,16 @@ describe('test $all', function () {
   });
   it('reverse: test $all', function () {
     assert(!checkDepends({ tags: { $all: ['web', 'app', 'desktop'] } }, data));
+  });
+  it('test $all objectid', function () {
+    assert(
+      checkDepends(
+        {
+          ids: { $all: [new ObjectID('5eec088b6032cb16eb2418ba'), new ObjectID('5eec088b6032cb16eb2418bb')] }
+        },
+        data
+      )
+    );
   });
   it('test $all nest array', function () {
     assert(checkDepends({ tags: { $all: [['web', 'app']] } }, data));
@@ -64,64 +75,84 @@ describe('test $all', function () {
     assert(checkDepends({ others: { $all: [null] } }, data));
   });
   it('test $all with $elemMatch', function () {
-    assert(checkDepends({
-      contributors: {
-        $all: [
-          {
-            $elemMatch: {
-              name: 'Liang'
-            }
-          }
-        ]
-      }
-    }, data));
-  });
-  it('test $all with $elemMatch', function () {
-    assert(checkDepends({
-      contributors: {
-        $all: [
-          {
-            $elemMatch: {
-              name: /Liang/
-            }
-          }
-        ]
-      }
-    }, data));
-  });
-  it('test $all with $elemMatch', function () {
-    assert(checkDepends({
-      contributors: {
-        $all: [
-          {
-            $elemMatch: {
-              name: {
-                $regex: 'liang',
-                $options: 'i'
+    assert(
+      checkDepends(
+        {
+          contributors: {
+            $all: [
+              {
+                $elemMatch: {
+                  name: 'Liang'
+                }
               }
-            }
+            ]
           }
-        ]
-      }
-    }, data));
+        },
+        data
+      )
+    );
+  });
+  it('test $all with $elemMatch', function () {
+    assert(
+      checkDepends(
+        {
+          contributors: {
+            $all: [
+              {
+                $elemMatch: {
+                  name: /Liang/
+                }
+              }
+            ]
+          }
+        },
+        data
+      )
+    );
+  });
+  it('test $all with $elemMatch', function () {
+    assert(
+      checkDepends(
+        {
+          contributors: {
+            $all: [
+              {
+                $elemMatch: {
+                  name: {
+                    $regex: 'liang',
+                    $options: 'i'
+                  }
+                }
+              }
+            ]
+          }
+        },
+        data
+      )
+    );
   });
   it('reverse: test $all with $elemMatch', function () {
-    assert(!checkDepends({
-      contributors: {
-        $all: [
-          {
-            $elemMatch: {
-              name: {
-                $regex: 'liang',
-                $options: 'i'
-              },
-              email: {
-                $regex: 'Liang'
+    assert(
+      !checkDepends(
+        {
+          contributors: {
+            $all: [
+              {
+                $elemMatch: {
+                  name: {
+                    $regex: 'liang',
+                    $options: 'i'
+                  },
+                  email: {
+                    $regex: 'Liang'
+                  }
+                }
               }
-            }
+            ]
           }
-        ]
-      }
-    }, data));
+        },
+        data
+      )
+    );
   });
 });

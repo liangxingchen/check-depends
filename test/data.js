@@ -4,6 +4,8 @@
  * @author Liang <liang@maichong.it>
  */
 
+const { ObjectID } = require('bson');
+
 module.exports = {
   name: 'Alaska',
   license: 'MIT',
@@ -25,5 +27,7 @@ module.exports = {
   one: 1,
   no: false,
   others: null,
-  undefined: undefined
+  undefined: undefined,
+  objectid: new ObjectID('5eec088b6032cb16eb2418ba'),
+  ids: [new ObjectID('5eec088b6032cb16eb2418ba'), new ObjectID('5eec088b6032cb16eb2418bb')]
 };

@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -50,5 +51,8 @@ describe('test $nin', function () {
   });
   it('query string $nin string array & $in string array', function () {
     assert(checkDepends({ license: { $nin: ['OpenBSD', 'GPL'], $in: ['GPL', 'MIT'] } }, data));
+  });
+  it('$nin objectid array', function () {
+    assert(checkDepends({ objectid: { $nin: [new ObjectID('5eec088b6032cb16eb240000')] } }, data));
   });
 });

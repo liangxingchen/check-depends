@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -32,5 +33,8 @@ describe('test $eq', function () {
   });
   it('value $eq number array', function () {
     assert(checkDepends({ numbers: { $eq: [0, 15, 20] } }, data));
+  });
+  it('value $eq objectid', function () {
+    assert(checkDepends({ objectid: { $eq: new ObjectID('5eec088b6032cb16eb2418ba') } }, data));
   });
 });

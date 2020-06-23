@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -20,5 +21,8 @@ describe('test $ne', function () {
   });
   it('reverse: value $ne number', function () {
     assert(!checkDepends({ from: { $ne: 2016 } }, data));
+  });
+  it('value $ne objectid', function () {
+    assert(checkDepends({ objectid: { $ne: new ObjectID('5eec088b6032cb16eb240000') } }, data));
   });
 });

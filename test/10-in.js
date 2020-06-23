@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -53,5 +54,8 @@ describe('test $in', function () {
   });
   it('reverse: query number $in RegExp array', function () {
     assert(!checkDepends({ from: { $in: [/1/] } }, data));
+  });
+  it('$in objectid array', function () {
+    assert(checkDepends({ objectid: { $in: [new ObjectID('5eec088b6032cb16eb2418ba')] } }, data));
   });
 });

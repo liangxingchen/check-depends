@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -61,5 +62,8 @@ describe('test $gte', function () {
   });
   it('0 $gte empty string', function () {
     assert(checkDepends({ bugs: { $gte: '' } }, data));
+  });
+  it('value $gte objectid', function () {
+    assert(checkDepends({ objectid: { $gte: new ObjectID('5eec088b6032cb16eb2418ba') } }, data));
   });
 });

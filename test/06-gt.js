@@ -5,6 +5,7 @@
  */
 
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const data = require('./data');
 
@@ -59,5 +60,8 @@ describe('test $gt', function () {
   });
   it('value $gt :ref', function () {
     assert(checkDepends({ from: { $gt: ':zero' } }, data));
+  });
+  it('value $gt objectid', function () {
+    assert(checkDepends({ objectid: { $gt: new ObjectID('5eec088b6032cb16eb240000') } }, data));
   });
 });
