@@ -39,6 +39,9 @@ describe('test $not', function () {
   it('test $not RegExp', function () {
     assert(checkDepends({ name: { $not: /PHP/ } }, data));
   });
+  it('test $not RegExp string', function () {
+    assert(checkDepends({ name: { $not: '/PHP/' } }, data));
+  });
   it('test $not $not', function () {
     assert(checkDepends({ bugs: { $not: { $not: { $eq: 0 } } } }, data));
   });

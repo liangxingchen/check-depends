@@ -1,6 +1,6 @@
 {
   "name": "check-depends",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Check object depends",
   "keywords": [
     "data check",
@@ -23,12 +23,12 @@
   },
   "homepage": "https://github.com/maichong/check-depends#readme",
   "devDependencies": {
-    "bson": "^4.0.4",
-    "mocha": "^8.0.1",
+    "bson": "^4.2.0",
+    "mocha": "^8.2.1",
     "nyc": "^15.1.0"
   },
   "dependencies": {
-    "ajv": "^6.12.2",
-    "lodash": "^4.17.15"
+    "ajv": "^6.12.6",
+    "lodash": "^4.17.20"
   }
 }

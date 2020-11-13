@@ -164,6 +164,9 @@ function checkValue(value, test, topData) {
       return !inArray(value, val, topData);
     }
     if (operator === '$not') {
+      if (typeof val === 'string') {
+        val = checkRegExp(val);
+      }
       if (val instanceof RegExp) {
         return !(typeof value === 'string' && val.test(value));
       } else if (isExpression(val)) {
