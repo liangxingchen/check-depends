@@ -7,7 +7,7 @@
 const assert = require('assert');
 const { ObjectID } = require('bson');
 const checkDepends = require('../');
-const data = require('./data');
+const { data } = require('./data');
 
 describe('test $gte', function () {
   it('value $gte string', function () {

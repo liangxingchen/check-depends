@@ -30,11 +30,14 @@ declare namespace CheckDepends {
     $jsonSchema?: any;
   }
 
-
   type DependsQueryExpression = void | null | boolean | string | QueryExpression;
 }
 
-
-declare function CheckDepends(depends: CheckDepends.DependsQueryExpression, data: any): boolean;
+declare function CheckDepends(
+  depends: CheckDepends.DependsQueryExpression,
+  data: any,
+  parent?: any,
+  top?: any
+): boolean;
 
 export = CheckDepends;

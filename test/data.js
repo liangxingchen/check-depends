@@ -6,10 +6,13 @@
 
 const { ObjectID } = require('bson');
 
-module.exports = {
+exports.data = {
   name: 'Alaska',
   license: 'MIT',
+  company: 'Maichong',
   author: 'Liang',
+  nodejs: true,
+  lang: 'nodejs',
   tags: ['web', 'app'],
   numbers: [0, 15, 20],
   empty: [],
@@ -30,4 +33,16 @@ module.exports = {
   undefined: undefined,
   objectid: new ObjectID('5eec088b6032cb16eb2418ba'),
   ids: [new ObjectID('5eec088b6032cb16eb2418ba'), new ObjectID('5eec088b6032cb16eb2418bb')]
+};
+
+exports.parent = {
+  platform: 'nodejs',
+  products: [exports.data]
+};
+
+exports.top = {
+  name: 'Maichong',
+  address: 'Zhengzhou',
+  since: 2013,
+  platforms: [exports.parent]
 };

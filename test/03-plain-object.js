@@ -6,7 +6,7 @@
 
 const assert = require('assert');
 const checkDepends = require('../');
-const data = require('./data');
+const { data } = require('./data');
 
 describe('query plain object', function () {
   it('value is string', function () {
@@ -160,27 +160,43 @@ describe('query plain object', function () {
   it('value = ref RegExp', function () {
     assert(checkDepends({ name: ':regexp' }, data));
   });
+  it('key is ref', function () {
+    assert(checkDepends({ ':lang': true }, data));
+  });
+  it('key is ref', function () {
+    assert(checkDepends({ ':lang': ':awesome' }, data));
+  });
 
   it('assembly', function () {
-    assert(checkDepends({
-      license: 'MIT',
-      from: 2016,
-      bugs: 0,
-      awesome: true,
-      no: false,
-      others: null,
-      undefined: undefined
-    }, data));
+    assert(
+      checkDepends(
+        {
+          license: 'MIT',
+          from: 2016,
+          bugs: 0,
+          awesome: true,
+          no: false,
+          others: null,
+          undefined: undefined
+        },
+        data
+      )
+    );
   });
   it('reverse: assembly', function () {
-    assert(!checkDepends({
-      license: 'MIT',
-      from: 2016,
-      bugs: 0,
-      awesome: true,
-      no: false,
-      others: null,
-      undefined: null
-    }, data));
+    assert(
+      !checkDepends(
+        {
+          license: 'MIT',
+          from: 2016,
+          bugs: 0,
+          awesome: true,
+          no: false,
+          others: null,
+          undefined: null
+        },
+        data
+      )
+    );
   });
 });

@@ -6,7 +6,7 @@
 
 const assert = require('assert');
 const checkDepends = require('../');
-const data = require('./data');
+const { data } = require('./data');
 
 describe('test $nor', function () {
   it('reverse: test plain object all matched', function () {

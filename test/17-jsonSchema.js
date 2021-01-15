@@ -6,33 +6,43 @@
 
 const assert = require('assert');
 const checkDepends = require('../');
-const data = require('./data');
+const { data } = require('./data');
 
 describe('test $jsonSchema', function () {
   it('query empty $jsonSchema', function () {
     assert(checkDepends({ $jsonSchema: {} }, data));
   });
   it('query $jsonSchema', function () {
-    assert(checkDepends({
-      $jsonSchema: {
-        properties: {
-          name: {
-            type: 'string'
+    assert(
+      checkDepends(
+        {
+          $jsonSchema: {
+            properties: {
+              name: {
+                type: 'string'
+              }
+            }
           }
-        }
-      }
-    }, data));
+        },
+        data
+      )
+    );
   });
   it('reverse: query $jsonSchema', function () {
-    assert(!checkDepends({
-      $jsonSchema: {
-        properties: {
-          name: {
-            type: 'number'
+    assert(
+      !checkDepends(
+        {
+          $jsonSchema: {
+            properties: {
+              name: {
+                type: 'number'
+              }
+            }
           }
-        }
-      }
-    }, data));
+        },
+        data
+      )
+    );
   });
   // Ajv 不会报错
   // it('reverse: query $jsonSchema', function () {
@@ -45,10 +55,15 @@ describe('test $jsonSchema', function () {
   //   }, data));
   // });
   it('reverse: query $jsonSchema', function () {
-    assert(!checkDepends({
-      $jsonSchema: {
-        enum: ['MIT', 'GPL']
-      }
-    }, data));
+    assert(
+      !checkDepends(
+        {
+          $jsonSchema: {
+            enum: ['MIT', 'GPL']
+          }
+        },
+        data
+      )
+    );
   });
 });

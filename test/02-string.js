@@ -4,10 +4,9 @@
  * @author Liang <liang@maichong.it>
  */
 
-
 const assert = require('assert');
 const checkDepends = require('../');
-const data = require('./data');
+const { data } = require('./data');
 
 describe('query string', function () {
   it('value is string', function () {
@@ -45,5 +44,8 @@ describe('query string', function () {
   });
   it('query !undefined', function () {
     assert(checkDepends('!undefined', data));
+  });
+  it('query embed string', function () {
+    assert(checkDepends('object.attr', data));
   });
 });

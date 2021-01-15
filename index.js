@@ -22,26 +22,39 @@ function isObjectId(val) {
   return val && typeof val === 'object' && typeof val.toHexString === 'function';
 }
 
-function getRef(test, topData) {
+function getRef(test, parent, top, root) {
   if (typeof test === 'string' && test[0] === ':') {
-    var key = test.substr(1);
-    return _.get(topData, key);
+    test = test.substr(1);
+    return get(test, root, parent, top);
   }
   return test;
+}
+
+function get(key, data, parent, top) {
+  if (key.startsWith('&.')) {
+    key = key.substr(2);
+    data = parent;
+  } else if (key.startsWith('&&.')) {
+    key = key.substr(3);
+    data = top;
+  }
+  return _.get(data, key);
 }
 
 /**
  * 检查值是否存在于数组中，支持正则数组匹配字符串值
  * @param {any} val
  * @param {Array<any>} array
- * @param {Object} topData
+ * @param {Object} parent
+ * @param {Object} top
+ * @param {Object} root
  * @returns {boolean}
  */
-function inArray(val, array, topData) {
+function inArray(val, array, parent, top, root) {
   var valueIsObjectId = isObjectId(val);
   for (var i in array) {
     var v = array[i];
-    v = getRef(v, topData);
+    v = getRef(v, parent, top, root);
     if (valueIsObjectId) {
       if (isObjectId(v) && v.toHexString() === val.toHexString()) return true;
       continue;
@@ -60,11 +73,13 @@ function inArray(val, array, topData) {
  *
  * @param {Array<any>|any} array 数组或数据
  * @param {any|RegExp} test
- * @param {Object} topData
+ * @param {Object} parent
+ * @param {Object} top
+ * @param {Object} root
  * @returns {boolean}
  */
-function findArrayElement(array, test, topData) {
-  test = getRef(test, topData);
+function findArrayElement(array, test, parent, top, root) {
+  test = getRef(test, parent, top, root);
   test = checkRegExp(test);
   if (test instanceof RegExp) {
     if (typeof array === 'string') {
@@ -115,11 +130,13 @@ function isExpression(exp) {
  * 检查数据
  * @param {string} value 值
  * @param {Object} test 表达式
- * @param {Object} topData
+ * @param {Object} parent
+ * @param {Object} top
+ * @param {Object} root
  */
-function checkValue(value, test, topData) {
+function checkValue(value, test, parent, top, root) {
   return _.every(test, function (val, operator) {
-    val = getRef(val, topData);
+    val = getRef(val, parent, top, root);
     if (operator === '$eq') {
       if (_.isArray(value) && !_.isArray(val)) {
         return value.indexOf(val) > -1;
@@ -147,10 +164,10 @@ function checkValue(value, test, topData) {
       }
       if (_.isArray(value)) {
         return !!_.find(value, function (v) {
-          return inArray(v, val, topData);
+          return inArray(v, val, parent, top, root);
         });
       }
-      return inArray(value, val, topData);
+      return inArray(value, val, parent, top, root);
     }
     if (operator === '$nin') {
       if (!_.isArray(val)) {
@@ -158,10 +175,10 @@ function checkValue(value, test, topData) {
       }
       if (_.isArray(value)) {
         return _.every(value, function (v) {
-          return !inArray(v, val, topData);
+          return !inArray(v, val, parent, top, root);
         });
       }
-      return !inArray(value, val, topData);
+      return !inArray(value, val, parent, top, root);
     }
     if (operator === '$not') {
       if (typeof val === 'string') {
@@ -170,7 +187,7 @@ function checkValue(value, test, topData) {
       if (val instanceof RegExp) {
         return !(typeof value === 'string' && val.test(value));
       } else if (isExpression(val)) {
-        return !checkValue(value, val, topData);
+        return !checkValue(value, val, parent, top, root);
       } else {
         throw new Error('$not needs a regex or a document');
       }
@@ -216,10 +233,10 @@ function checkValue(value, test, topData) {
           }
           // $all with $elemMatch
           return _.find(value, function (v) {
-            return checkDepends(el.$elemMatch, v, topData);
+            return checkDepends(el.$elemMatch, v, parent, top, root);
           });
         }
-        if (!findArrayElement(value, el, topData)) {
+        if (!findArrayElement(value, el, parent, top, root)) {
           return false;
         }
       }
@@ -233,12 +250,12 @@ function checkValue(value, test, topData) {
       if (!_.isArray(value)) return false;
       if (isExpression(val)) {
         return _.find(value, function (v) {
-          return checkValue(v, val, topData);
+          return checkValue(v, val, parent, top, root);
         });
       }
       // Object
       return _.find(value, function (v) {
-        return checkDepends(val, v, topData);
+        return checkDepends(val, v, parent, top, root);
       });
     }
 
@@ -264,47 +281,51 @@ function checkValue(value, test, topData) {
  * 检查依赖
  * @param {undefined|null|boolean|string|Object} query
  * @param {Object} data
- * @param {Object} [topData]
+ * @param {Object} [parent]
+ * @param {Object} [top]
+ * @param {Object} [root]
  * @returns {boolean}
  */
-function checkDepends(query, data, topData) {
+function checkDepends(query, data, parent, top, root) {
   if (query === undefined || data === undefined) return false;
   if (query === null) return false;
   if (query === '') return false;
   if (typeof query === 'boolean') return query;
+  top = top || parent || data;
+  root = root || data;
   if (typeof query === 'string') {
+    var reverse;
     if (query[0] === '!') {
       //反向
+      reverse = true;
       query = query.substr(1);
-      return !data[query];
     }
-    return !!data[query];
+    var res = get(query, data, parent, top);
+    return reverse ? !res : !!res;
   }
-  topData = topData || data;
   return _.every(query, function (test, key) {
-    // 值是引用
-    test = getRef(test, topData);
-
+    key = getRef(key, parent, top, root);
+    test = getRef(test, parent, top, root);
     if (key === '$and') {
       if (!_.isArray(test)) {
         throw new Error('$and must be an array');
       }
       return _.every(test, function (v) {
-        return checkDepends(v, data, topData);
+        return checkDepends(v, data, parent, top, root);
       });
     } else if (key === '$or') {
       if (!_.isArray(test)) {
         throw new Error('$or must be an array');
       }
       return _.find(test, function (v) {
-        return checkDepends(v, data, topData);
+        return checkDepends(v, data, parent, top, root);
       });
     } else if (key === '$nor') {
       if (!_.isArray(test)) {
         throw new Error('$nor must be an array');
       }
       return !_.find(test, function (v) {
-        return checkDepends(v, data, topData);
+        return checkDepends(v, data, parent, top, root);
       });
     } else if (key === '$jsonSchema') {
       if (!test || typeof test !== 'object' || _.isArray(test)) {
@@ -316,15 +337,15 @@ function checkDepends(query, data, topData) {
     }
 
     test = checkRegExp(test);
-    var value = _.get(data, key);
+    var value = get(key, data, parent, top);
 
     if (isExpression(test)) {
       // 表达式对象
-      return checkValue(value, test, topData);
+      return checkValue(value, test, parent, top, root);
     }
 
     if (_.isArray(value) && !_.isArray(test)) {
-      return findArrayElement(value, test, topData);
+      return findArrayElement(value, test, parent, top, root);
     }
 
     if (typeof value === 'string' && test instanceof RegExp) {
