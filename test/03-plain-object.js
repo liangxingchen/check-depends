@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-06
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const checkDepends = require('../');
 const { data } = require('./data');
@@ -48,16 +42,16 @@ describe('query plain object', function () {
   });
 
   it('value is null', function () {
-    assert(checkDepends({ others: null }, data));
+    assert(checkDepends({ null: null }, data));
   });
   it('reverse: query 0 & value is null', function () {
-    assert(!checkDepends({ others: 0 }, data));
+    assert(!checkDepends({ null: 0 }, data));
   });
   it('reverse: query false & value is null', function () {
-    assert(!checkDepends({ others: false }, data));
+    assert(!checkDepends({ null: false }, data));
   });
   it('reverse: query undefined & value is null', function () {
-    assert(!checkDepends({ others: undefined }, data));
+    assert(checkDepends({ null: undefined }, data));
   });
 
   it('value is undefined', function () {
@@ -70,7 +64,10 @@ describe('query plain object', function () {
     assert(!checkDepends({ undefined: false }, data));
   });
   it('reverse: query null & value is undefined', function () {
-    assert(!checkDepends({ undefined: null }, data));
+    assert(checkDepends({ undefined: null }, data));
+  });
+  it('query null & value is not exist', function () {
+    assert(checkDepends({ noExist: null }, data));
   });
 
   it('value is not exist', function () {
@@ -82,16 +79,13 @@ describe('query plain object', function () {
   it('reverse: query false & value is not exist', function () {
     assert(!checkDepends({ noExist: false }, data));
   });
-  it('reverse: query null & value is not exist', function () {
-    assert(!checkDepends({ noExist: null }, data));
-  });
 
   it('reverse: query {} & value is string', function () {
     assert(!checkDepends({ license: {} }, data));
   });
 
   it('reverse: query {} & value is null', function () {
-    assert(!checkDepends({ others: {} }, data));
+    assert(!checkDepends({ null: {} }, data));
   });
 
   it('query {} & value is {}', function () {
@@ -176,8 +170,8 @@ describe('query plain object', function () {
           bugs: 0,
           awesome: true,
           no: false,
-          others: null,
-          undefined: undefined
+          null: null,
+          undefined: null
         },
         data
       )
@@ -192,8 +186,8 @@ describe('query plain object', function () {
           bugs: 0,
           awesome: true,
           no: false,
-          others: null,
-          undefined: null
+          null: null,
+          undefined: false
         },
         data
       )

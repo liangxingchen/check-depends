@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-07
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const checkDepends = require('../');
 const { data } = require('./data');
@@ -13,7 +7,7 @@ describe('test $exists', function () {
     assert(checkDepends({ license: { $exists: true } }, data));
   });
   it('value $exists null', function () {
-    assert(checkDepends({ others: { $exists: true } }, data));
+    assert(checkDepends({ null: { $exists: true } }, data));
   });
   it('value not $exists undefined', function () {
     assert(checkDepends({ undefined: { $exists: false } }, data));

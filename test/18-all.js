@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-07
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const { ObjectID } = require('bson');
 const checkDepends = require('../');
@@ -42,13 +36,13 @@ describe('test $all', function () {
     assert(!checkDepends({ tags: { $all: [['web']] } }, data));
   });
   it('test $all RegExp on string', function () {
-    assert(checkDepends({ name: { $all: [/Alaska/] } }, data));
+    assert(checkDepends({ name: { $all: [/CheckDepends/] } }, data));
   });
   it('test $all ref RegExp string on string', function () {
     assert(checkDepends({ name: { $all: [':name'] } }, data));
   });
   it('reverse: test $all RegExp on string', function () {
-    assert(!checkDepends({ name: { $all: [/alaska/] } }, data));
+    assert(!checkDepends({ name: { $all: [/checkdepends/] } }, data));
   });
   it('test $all RegExp', function () {
     assert(checkDepends({ tags: { $all: [/web/] } }, data));
@@ -72,7 +66,7 @@ describe('test $all', function () {
     assert(!checkDepends({ numbers: { $all: [] } }, data));
   });
   it('test null', function () {
-    assert(checkDepends({ others: { $all: [null] } }, data));
+    assert(checkDepends({ null: { $all: [null] } }, data));
   });
   it('test $all with $elemMatch', function () {
     assert(
@@ -143,7 +137,7 @@ describe('test $all', function () {
                     $regex: 'liang',
                     $options: 'i'
                   },
-                  email: {
+                  url: {
                     $regex: 'Liang'
                   }
                 }

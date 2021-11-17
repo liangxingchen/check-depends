@@ -4,3 +4,4 @@ coverage
 test
 package-lock.json
 yarn.lock
+tmp

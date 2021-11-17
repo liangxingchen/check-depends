@@ -2,7 +2,7 @@ const assert = require('assert');
 const checkDepends = require('../');
 const { data, parent, top } = require('./data');
 
-describe('test parent', function () {
+describe('test top', function () {
   it('query string', function () {
     assert(checkDepends('&&.address', data, parent, top));
   });

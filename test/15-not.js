@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-07
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const checkDepends = require('../');
 const { data } = require('./data');
@@ -46,6 +40,6 @@ describe('test $not', function () {
     assert(checkDepends({ bugs: { $not: { $not: { $eq: 0 } } } }, data));
   });
   it('test $not $not RegExp', function () {
-    assert(checkDepends({ name: { $not: { $not: /Alaska/ } } }, data));
+    assert(checkDepends({ name: { $not: { $not: /CheckDepends/ } } }, data));
   });
 });

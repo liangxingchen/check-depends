@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-07
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const checkDepends = require('../');
 const { data } = require('./data');

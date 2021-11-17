@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-07
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const { ObjectID } = require('bson');
 const checkDepends = require('../');
@@ -57,5 +51,14 @@ describe('test $in', function () {
   });
   it('$in objectid array', function () {
     assert(checkDepends({ objectid: { $in: [new ObjectID('5eec088b6032cb16eb2418ba')] } }, data));
+  });
+  it('null $in null array', function () {
+    assert(checkDepends({ null: { $in: [true, false, null] } }, data));
+  });
+  it('undefined $in null array', function () {
+    assert(checkDepends({ undefined: { $in: [true, false, null] } }, data));
+  });
+  it('noExist $in null array', function () {
+    assert(checkDepends({ noExist: { $in: [true, false, null] } }, data));
   });
 });

@@ -63,7 +63,7 @@ function inArray(val, array, parent, top, root) {
     if (typeof val === 'string' && v && v instanceof RegExp) {
       if (v.test(val)) return true;
     } else {
-      if (val === v) return true;
+      if (eq(val, v)) return true;
     }
   }
   return false;
@@ -126,6 +126,39 @@ function isExpression(exp) {
   return false;
 }
 
+function eq(value, other) {
+  if (value === undefined) value = null;
+  if (other === undefined) other = null;
+  if (value === other) return true;
+  if (!value || !other || typeof value !== 'object' || typeof other !== 'object') return false;
+  if (_.isArray(value)) {
+    if (!_.isArray(other)) return false;
+    if (value.length !== other.length) return false;
+    return _.every(value, function (v, i) {
+      return eq(v, other[i]);
+    });
+  }
+  if (isObjectId(value)) {
+    return isObjectId(other) && String(value) === String(other);
+  }
+  var keys = Object.keys(value);
+  for (var i in keys) {
+    var key = keys[i];
+    if (!eq(value[key], other[key])) return false;
+  }
+  return Object.keys(other).every(function (key) {
+    return keys.includes(key) || other[key] === null || other[key] === null;
+  });
+}
+
+function gt(a, b) {
+  return a > b && typeof a === typeof b;
+}
+
+function lt(a, b) {
+  return a < b && typeof a === typeof b;
+}
+
 /**
  * 检查数据
  * @param {string} value 值
@@ -134,29 +167,32 @@ function isExpression(exp) {
  * @param {Object} top
  * @param {Object} root
  */
-function checkValue(value, test, parent, top, root) {
+function checkExpression(value, test, parent, top, root) {
+  var _value = value;
+  if (value === undefined) value = null;
   return _.every(test, function (val, operator) {
     val = getRef(val, parent, top, root);
+    if (val === undefined) val = null;
     if (operator === '$eq') {
       if (_.isArray(value) && !_.isArray(val)) {
         return value.indexOf(val) > -1;
       }
-      return _.isEqual(value, val);
+      return eq(value, val);
     }
     if (operator === '$ne') {
-      return !_.isEqual(value, val);
+      return !eq(value, val);
     }
     if (operator === '$gt') {
-      return value > val;
+      return gt(value, val);
     }
     if (operator === '$gte') {
-      return value >= val;
+      return eq(value, val) || gt(value, val);
     }
     if (operator === '$lt') {
-      return value < val;
+      return lt(value, val);
     }
     if (operator === '$lte') {
-      return value <= val;
+      return eq(value, val) || lt(value, val);
     }
     if (operator === '$in') {
       if (!_.isArray(val)) {
@@ -187,7 +223,7 @@ function checkValue(value, test, parent, top, root) {
       if (val instanceof RegExp) {
         return !(typeof value === 'string' && val.test(value));
       } else if (isExpression(val)) {
-        return !checkValue(value, val, parent, top, root);
+        return !checkExpression(value, val, parent, top, root);
       } else {
         throw new Error('$not needs a regex or a document');
       }
@@ -225,7 +261,7 @@ function checkValue(value, test, parent, top, root) {
       for (var i in val) {
         var el = val[i];
         if (_.isArray(el)) {
-          return _.isEqual(el, value);
+          return eq(el, value);
         }
         if (isExpression(el)) {
           if (!el.$elemMatch) {
@@ -250,7 +286,7 @@ function checkValue(value, test, parent, top, root) {
       if (!_.isArray(value)) return false;
       if (isExpression(val)) {
         return _.find(value, function (v) {
-          return checkValue(v, val, parent, top, root);
+          return checkExpression(v, val, parent, top, root);
         });
       }
       // Object
@@ -270,7 +306,7 @@ function checkValue(value, test, parent, top, root) {
       if (typeof val !== 'boolean') {
         throw new Error('$exists needs a boolean');
       }
-      var res = value === undefined;
+      var res = _value === undefined;
       return val ? !res : res;
     }
     throw new Error('unsupported comparison operator: ' + operator);
@@ -306,6 +342,7 @@ function checkDepends(query, data, parent, top, root) {
   return _.every(query, function (test, key) {
     key = getRef(key, parent, top, root);
     test = getRef(test, parent, top, root);
+    if (test === undefined) test = null;
     if (key === '$and') {
       if (!_.isArray(test)) {
         throw new Error('$and must be an array');
@@ -341,7 +378,7 @@ function checkDepends(query, data, parent, top, root) {
 
     if (isExpression(test)) {
       // 表达式对象
-      return checkValue(value, test, parent, top, root);
+      return checkExpression(value, test, parent, top, root);
     }
 
     if (_.isArray(value) && !_.isArray(test)) {
@@ -352,7 +389,7 @@ function checkDepends(query, data, parent, top, root) {
       return test.test(value);
     }
 
-    return _.isEqual(test, value);
+    return eq(test, value);
   });
 }
 

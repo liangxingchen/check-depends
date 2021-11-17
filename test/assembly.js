@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-07
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const checkDepends = require('../');
 const { data } = require('./data');
@@ -15,8 +9,7 @@ describe('test assembly', function () {
         {
           license: { $in: ['MIT', 'Apache', 'BSD'] },
           from: { $gt: 2012, $lt: 2018 },
-          bugs: { $gte: false, $eq: 0, $in: [0, 1] },
-          undefined: { $ne: 1 },
+          bugs: { $lt: 100, $eq: 0, $in: [0, 1] },
           one: { $gt: 0 }
         },
         data
@@ -28,13 +21,12 @@ describe('test assembly', function () {
     assert(
       checkDepends(
         {
-          name: 'Alaska',
+          name: 'CheckDepends',
           $or: [
             {
               license: { $in: ['MIT', 'Apache', 'BSD'] },
               from: 2017,
-              bugs: 0,
-              undefined: { $ne: 1 }
+              bugs: 0
             },
             {
               from: 2016

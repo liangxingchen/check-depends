@@ -1,9 +1,3 @@
-/**
- * @copyright Maichong Software Ltd. 2018 http://maichong.it
- * @date 2018-01-06
- * @author Liang <liang@maichong.it>
- */
-
 const assert = require('assert');
 const { ObjectID } = require('bson');
 const checkDepends = require('../');
@@ -23,7 +17,7 @@ describe('test $gt', function () {
     assert(!checkDepends({ from: { $gt: 2017 } }, data));
   });
   it('reverse: null $gt null', function () {
-    assert(!checkDepends({ others: { $gt: null } }, data));
+    assert(!checkDepends({ null: { $gt: null } }, data));
   });
   it('reverse: 0 $gt null', function () {
     assert(!checkDepends({ bugs: { $gt: null } }, data));
@@ -37,17 +31,17 @@ describe('test $gt', function () {
   it('reverse: not exist $gt null', function () {
     assert(!checkDepends({ noExist: { $gt: null } }, data));
   });
-  it('number $gt false', function () {
-    assert(checkDepends({ from: { $gt: false } }, data));
+  it('reverse: number $gt false', function () {
+    assert(!checkDepends({ from: { $gt: false } }, data));
   });
-  it('number $gt true', function () {
-    assert(checkDepends({ from: { $gt: true } }, data));
+  it('reverse: number $gt true', function () {
+    assert(!checkDepends({ from: { $gt: true } }, data));
   });
-  it('number $gt empty string', function () {
-    assert(checkDepends({ from: { $gt: '' } }, data));
+  it('reverse: number $gt empty string', function () {
+    assert(!checkDepends({ from: { $gt: '' } }, data));
   });
-  it('number $gt string number', function () {
-    assert(checkDepends({ from: { $gt: '5' } }, data));
+  it('reverse: number $gt string number', function () {
+    assert(!checkDepends({ from: { $gt: '5' } }, data));
   });
   it('reverse: 0 $gt false', function () {
     assert(!checkDepends({ bugs: { $gt: false } }, data));
