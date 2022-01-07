@@ -19,4 +19,19 @@ describe('test $ne', function () {
   it('value $ne objectid', function () {
     assert(checkDepends({ objectid: { $ne: new ObjectID('5eec088b6032cb16eb240000') } }, data));
   });
+  it('reverse: value $ne objectid', function () {
+    assert(!checkDepends({ objectid: { $ne: new ObjectID('5eec088b6032cb16eb2418ba') } }, data));
+  });
+  it('string $ne objectid', function () {
+    assert(checkDepends({ objectid: { $ne: '5eec088b6032cb16eb240000' } }, data));
+  });
+  it('reverse: string $ne objectid', function () {
+    assert(!checkDepends({ objectid: { $ne: '5eec088b6032cb16eb2418ba' } }, data));
+  });
+  it('objectid $ne string', function () {
+    assert(checkDepends({ id: { $ne: new ObjectID('5eec088b6032cb16eb240000') } }, data));
+  });
+  it('reverse: objectid $ne string', function () {
+    assert(!checkDepends({ id: { $ne: new ObjectID('5eec088b6032cb16eb2418ba') } }, data));
+  });
 });

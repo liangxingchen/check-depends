@@ -79,6 +79,7 @@ checkDepends({ $jsonSchema: { properties: { name: { type: 'number' } } } }); //f
 - MongoDB支持JSON Schema draft 4，check-depends 使用AJV验证JSON Schema
 - check-depends 中`:`开头的字符串 `:key`，代表data值引用
 - check-depends 支持 string.length 和 array.length 查询
+- check-depends 中ObjectID和24位字符串相等
 
 差异举例：
 

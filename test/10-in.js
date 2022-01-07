@@ -52,6 +52,18 @@ describe('test $in', function () {
   it('$in objectid array', function () {
     assert(checkDepends({ objectid: { $in: [new ObjectID('5eec088b6032cb16eb2418ba')] } }, data));
   });
+  it('query objectid $in string array', function () {
+    assert(checkDepends({ objectid: { $in: ['5eec088b6032cb16eb2418ba'] } }, data));
+  });
+  it('reverse: query objectid $in string array', function () {
+    assert(!checkDepends({ objectid: { $in: ['5eec088b6032cb16eb2418b0'] } }, data));
+  });
+  it('query string $in objectid array', function () {
+    assert(checkDepends({ id: { $in: [new ObjectID('5eec088b6032cb16eb2418ba')] } }, data));
+  });
+  it('reverse: query string $in objectid array', function () {
+    assert(!checkDepends({ id: { $in: [new ObjectID('5eec088b6032cb16eb2418b0')] } }, data));
+  });
   it('null $in null array', function () {
     assert(checkDepends({ null: { $in: [true, false, null] } }, data));
   });

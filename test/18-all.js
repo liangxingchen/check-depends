@@ -29,6 +29,26 @@ describe('test $all', function () {
       )
     );
   });
+  it('query objectid $all string', function () {
+    assert(
+      checkDepends(
+        {
+          ids: { $all: ['5eec088b6032cb16eb2418ba', '5eec088b6032cb16eb2418bb'] }
+        },
+        data
+      )
+    );
+  });
+  it('query objectid $all objectid/string', function () {
+    assert(
+      checkDepends(
+        {
+          ids: { $all: [new ObjectID('5eec088b6032cb16eb2418ba'), '5eec088b6032cb16eb2418bb'] }
+        },
+        data
+      )
+    );
+  });
   it('test $all nest array', function () {
     assert(checkDepends({ tags: { $all: [['web', 'app']] } }, data));
   });

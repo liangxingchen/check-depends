@@ -1,6 +1,6 @@
 {
   "name": "check-depends",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Check object depends",
   "keywords": [
     "data check",
@@ -28,7 +28,7 @@
     "nyc": "^15.1.0"
   },
   "dependencies": {
-    "ajv": "^8.8.1",
+    "ajv": "^8.8.2",
     "lodash": "^4.17.21"
   }
 }

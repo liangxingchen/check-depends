@@ -31,4 +31,10 @@ describe('test $eq', function () {
   it('value $eq objectid', function () {
     assert(checkDepends({ objectid: { $eq: new ObjectID('5eec088b6032cb16eb2418ba') } }, data));
   });
+  it('string $eq objectid', function () {
+    assert(checkDepends({ objectid: { $eq: '5eec088b6032cb16eb2418ba' } }, data));
+  });
+  it('objectid $eq string', function () {
+    assert(checkDepends({ id: { $eq: new ObjectID('5eec088b6032cb16eb2418ba') } }, data));
+  });
 });

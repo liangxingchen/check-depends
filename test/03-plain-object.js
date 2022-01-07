@@ -1,4 +1,5 @@
 const assert = require('assert');
+const { ObjectID } = require('bson');
 const checkDepends = require('../');
 const { data } = require('./data');
 
@@ -102,6 +103,22 @@ describe('query plain object', function () {
 
   it('reverse: query {...} & value is {...}', function () {
     assert(!checkDepends({ object: { attr: 1, $gt: 0 } }, data));
+  });
+
+  it('query string & value is ObjectId', function () {
+    assert(checkDepends({ objectid: '5eec088b6032cb16eb2418ba' }, data));
+  });
+
+  it('reverse: query string & value is ObjectId', function () {
+    assert(!checkDepends({ objectid: '5eec088b6032cb16eb2418b0' }, data));
+  });
+
+  it('query ObjectId & value is string', function () {
+    assert(checkDepends({ id: new ObjectID('5eec088b6032cb16eb2418ba') }, data));
+  });
+
+  it('reverse: query ObjectId & value is string', function () {
+    assert(!checkDepends({ id: new ObjectID('5eec088b6032cb16eb2418b0') }, data));
   });
 
   it('query object.key', function () {

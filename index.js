@@ -51,14 +51,9 @@ function get(key, data, parent, top) {
  * @returns {boolean}
  */
 function inArray(val, array, parent, top, root) {
-  var valueIsObjectId = isObjectId(val);
   for (var i in array) {
     var v = array[i];
     v = getRef(v, parent, top, root);
-    if (valueIsObjectId) {
-      if (isObjectId(v) && v.toHexString() === val.toHexString()) return true;
-      continue;
-    }
     v = checkRegExp(v);
     if (typeof val === 'string' && v && v instanceof RegExp) {
       if (v.test(val)) return true;
@@ -94,14 +89,10 @@ function findArrayElement(array, test, parent, top, root) {
   }
 
   if (_.isArray(array)) {
-    if (isObjectId(test))
-      return !!_.find(array, function (v) {
-        return isObjectId(v) && v.toHexString() === test.toHexString();
-      });
-    return array.indexOf(test) > -1;
+    return inArray(test, array);
   }
 
-  return array === test;
+  return eq(array, test);
 }
 
 /**
@@ -130,6 +121,9 @@ function eq(value, other) {
   if (value === undefined) value = null;
   if (other === undefined) other = null;
   if (value === other) return true;
+  if (isObjectId(value) || isObjectId(other)) {
+    return String(value) === String(other);
+  }
   if (!value || !other || typeof value !== 'object' || typeof other !== 'object') return false;
   if (_.isArray(value)) {
     if (!_.isArray(other)) return false;
@@ -137,9 +131,6 @@ function eq(value, other) {
     return _.every(value, function (v, i) {
       return eq(v, other[i]);
     });
-  }
-  if (isObjectId(value)) {
-    return isObjectId(other) && String(value) === String(other);
   }
   var keys = Object.keys(value);
   for (var i in keys) {

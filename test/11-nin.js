@@ -49,4 +49,13 @@ describe('test $nin', function () {
   it('$nin objectid array', function () {
     assert(checkDepends({ objectid: { $nin: [new ObjectID('5eec088b6032cb16eb240000')] } }, data));
   });
+  it('reverse: $nin objectid array', function () {
+    assert(!checkDepends({ objectid: { $nin: [new ObjectID('5eec088b6032cb16eb2418ba')] } }, data));
+  });
+  it('query string $nin objectid array', function () {
+    assert(checkDepends({ objectid: { $nin: ['5eec088b6032cb16eb240000'] } }, data));
+  });
+  it('reverse: query string $nin objectid array', function () {
+    assert(!checkDepends({ objectid: { $nin: ['5eec088b6032cb16eb2418ba'] } }, data));
+  });
 });
